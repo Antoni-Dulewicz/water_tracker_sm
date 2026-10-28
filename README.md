@@ -5,5 +5,5 @@ Date | Progress
 --- | ---
 12-18.10 | Project topic discusion
 19-25.10 | Project init
-26.10-1.11| 
+26.10-1.11| Setting/Home/History screens + navigation added
 ## Setup Instruction

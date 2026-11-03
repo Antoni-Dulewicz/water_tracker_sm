@@ -1,57 +1,58 @@
 package com.example.watertracker.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val LightColors = lightColorScheme(
+    primary = Color(0xFF1976D2),
+    onPrimary = Color.White,
+
+    secondary = Color(0xFF42A5F5),
+    onSecondary = Color.White,
+
+    background = Color(0xFFF5F8FC),
+    onBackground = Color(0xFF263238),
+
+    surface = Color.White,
+    onSurface = Color(0xFF263238),
+
+    surfaceVariant = Color(0xFFE3F2FD),
+    onSurfaceVariant = Color(0xFF546E7A)
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+private val DarkColors = darkColorScheme(
+    primary = Color(0xFF90CAF9),
+    onPrimary = Color(0xFF003258),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = Color(0xFF64B5F6),
+    onSecondary = Color(0xFF003258),
+
+    background = Color(0xFF121820),
+    onBackground = Color(0xFFE7EDF3),
+
+    surface = Color(0xFF1E2935),
+    onSurface = Color(0xFFE7EDF3),
+
+    surfaceVariant = Color(0xFF304252),
+    onSurfaceVariant = Color(0xFFB0BEC5)
 )
 
 @Composable
 fun WaterTrackerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colors = if (darkTheme) {
+        DarkColors
+    } else {
+        LightColors
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colors,
         typography = Typography,
         content = content
     )

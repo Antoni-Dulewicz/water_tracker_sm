@@ -1,4 +1,4 @@
-package pl.example.watertracker.navigation
+package com.example.watertracker.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,18 +12,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.watertracker.navigation.Screen
 import com.example.watertracker.ui.screens.HistoryScreen
 import com.example.watertracker.ui.screens.SettingsScreen
 import com.example.watertracker.ui.screens.TodayScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean)  -> Unit
+) {
     val navController = rememberNavController()
     val backStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry.value?.destination?.route
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
@@ -90,7 +93,10 @@ fun AppNavigation() {
             }
 
             composable(Screen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = onDarkModeChange
+                )
             }
         }
     }

@@ -1,40 +1,44 @@
 package com.example.watertracker
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.watertracker.data.preferences.darkModeFlow
+import com.example.watertracker.data.preferences.setDarkMode
+import com.example.watertracker.navigation.AppNavigation
 import com.example.watertracker.ui.theme.WaterTrackerTheme
-import pl.example.watertracker.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
-            WaterTrackerTheme {
-                AppNavigation()
+
+            // Odczyt aktualnego ustawienia z DataStore
+            val isDarkMode by applicationContext
+                .darkModeFlow
+                .collectAsState(initial = false)
+
+            val coroutineScope = rememberCoroutineScope()
+
+            // Cała aplikacja korzysta z jednego motywu
+            WaterTrackerTheme(darkTheme = isDarkMode) {
+
+                AppNavigation(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = { enabled ->
+                        coroutineScope.launch {
+                            applicationContext.setDarkMode(enabled)
+                        }
+                    }
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WaterTrackerTheme {
-        Greeting("Android")
     }
 }

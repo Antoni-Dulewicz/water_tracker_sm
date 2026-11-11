@@ -20,14 +20,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            // Odczyt aktualnego ustawienia z DataStore
             val isDarkMode by applicationContext
                 .darkModeFlow
                 .collectAsState(initial = false)
 
             val coroutineScope = rememberCoroutineScope()
 
-            // Cała aplikacja korzysta z jednego motywu
             WaterTrackerTheme(darkTheme = isDarkMode) {
 
                 AppNavigation(

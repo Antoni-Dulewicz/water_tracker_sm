@@ -1,24 +1,32 @@
+
 package com.example.watertracker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.watertracker.ui.components.*
+import com.example.watertracker.viewmodel.WaterViewModel
 
 @Composable
-fun TodayScreen() {
-    var consumed by remember { mutableIntStateOf(1250) }
-    val goal = 2000
-    val progress = (consumed.toFloat() / goal).coerceIn(0f, 1f)
+fun TodayScreen(
+    viewModel: WaterViewModel = viewModel()
+) {
+    val todayEntries by viewModel.todayEntries.collectAsState()
+    val dailyGoal by viewModel.dailyGoal.collectAsState()
+
+    val consumed = todayEntries.sumOf { it.amount }
+
+    val progress = (consumed.toFloat() / dailyGoal)
+        .coerceIn(0f, 1f)
 
     Column(
         modifier = Modifier
@@ -72,7 +80,7 @@ fun TodayScreen() {
                     )
 
                     Text(
-                        "z $goal ml",
+                        "z $dailyGoal ml",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -80,24 +88,30 @@ fun TodayScreen() {
             }
 
             Text(
-                "Pozostało ${maxOf(goal - consumed, 0)} ml do celu",
+                "Pozostało ${maxOf(dailyGoal - consumed, 0)} ml do celu",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             Text(
                 "Dodaj wodę",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 listOf(150, 250, 500).forEach { amount ->
                     Button(
-                        onClick = { consumed += amount },
+                        onClick = {
+                            viewModel.addWater(amount)
+                        },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(14.dp),
                         contentPadding = PaddingValues(vertical = 14.dp)
@@ -105,6 +119,24 @@ fun TodayScreen() {
                         Text("+${amount} ml")
                     }
                 }
+            }
+
+            OutlinedButton(
+                onClick = {
+                    viewModel.undoLastEntry()
+                },
+                enabled = todayEntries.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Icon(
+                    Icons.Default.Undo,
+                    contentDescription = null
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                Text("Cofnij ostatni wpis")
             }
         }
 
@@ -121,7 +153,11 @@ fun TodayScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Realizacja celu", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    "Realizacja celu",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
                 Text(
                     "${(progress * 100).toInt()}%",
                     color = MaterialTheme.colorScheme.primary,

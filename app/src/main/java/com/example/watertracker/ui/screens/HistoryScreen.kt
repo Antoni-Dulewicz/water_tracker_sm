@@ -5,16 +5,44 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.watertracker.ui.components.*
+import com.example.watertracker.viewmodel.WaterViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
-fun HistoryScreen() {
-    val values = listOf(1400, 1800, 2100, 1600, 2300, 1900, 1250)
-    val days = listOf("Pn", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd")
+fun HistoryScreen(
+    viewModel: WaterViewModel
+) {
+    val values by viewModel.last7Days.collectAsState()
+
+    val locale = Locale("pl", "PL")
+
+    val days = (6 downTo 0).map { daysAgo ->
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -daysAgo)
+
+        SimpleDateFormat("EEE", locale)
+            .format(calendar.time)
+            .replaceFirstChar { it.uppercase() }
+    }
+
+    val fullDays = (6 downTo 0).map { daysAgo ->
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -daysAgo)
+
+        SimpleDateFormat("EEEE", locale)
+            .format(calendar.time)
+            .replaceFirstChar { it.uppercase() }
+    }
+
     val average = values.average().toInt()
 
     Column(
@@ -107,12 +135,11 @@ fun HistoryScreen() {
 
             Spacer(Modifier.height(12.dp))
 
-            val recentDays = listOf(
-                "Niedziela" to 1250,
-                "Sobota" to 1900,
-                "Piątek" to 2300,
-                "Czwartek" to 1600
-            )
+            val recentDays = fullDays
+                .zip(values)
+                .dropLast(1)
+                .reversed()
+                .take(4)
 
             recentDays.forEach { (day, amount) ->
                 Row(

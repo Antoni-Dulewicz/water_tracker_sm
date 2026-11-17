@@ -7,7 +7,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -15,6 +18,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.watertracker.ui.screens.HistoryScreen
 import com.example.watertracker.ui.screens.SettingsScreen
 import com.example.watertracker.ui.screens.TodayScreen
+import com.example.watertracker.viewmodel.WaterViewModel
+import com.example.watertracker.viewmodel.WaterViewModelFactory
 
 @Composable
 fun AppNavigation(
@@ -22,7 +27,19 @@ fun AppNavigation(
     onDarkModeChange: (Boolean)  -> Unit
 ) {
     val navController = rememberNavController()
+
+    val context = LocalContext.current
+
+    val factory = remember {
+        WaterViewModelFactory(context)
+    }
+
+    val waterViewModel: WaterViewModel = viewModel(
+        factory = factory
+    )
+
     val backStackEntry = navController.currentBackStackEntryAsState()
+
     val currentRoute = backStackEntry.value?.destination?.route
 
     Scaffold(
@@ -85,11 +102,15 @@ fun AppNavigation(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Today.route) {
-                TodayScreen()
+                TodayScreen(
+                    viewModel = waterViewModel
+                )
             }
 
             composable(Screen.History.route) {
-                HistoryScreen()
+                HistoryScreen(
+                    viewModel = waterViewModel
+                )
             }
 
             composable(Screen.Settings.route) {

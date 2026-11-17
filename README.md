@@ -8,4 +8,5 @@ Date | Progress
 26.10-1.11| Setting/Home/History screens + navigation added
 2.11 - 8.11| UI for main screens and dark mode implemented
 9.11 - 15.11| Logic for adding and substracting water
+16.11 - 22.11 | Persist data
 ## Setup Instruction

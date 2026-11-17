@@ -18,7 +18,7 @@ import com.example.watertracker.viewmodel.WaterViewModel
 
 @Composable
 fun TodayScreen(
-    viewModel: WaterViewModel = viewModel()
+    viewModel: WaterViewModel
 ) {
     val todayEntries by viewModel.todayEntries.collectAsState()
     val dailyGoal by viewModel.dailyGoal.collectAsState()
@@ -107,7 +107,7 @@ fun TodayScreen(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                listOf(150, 250, 500).forEach { amount ->
+                listOf(50, 100, 250).forEach { amount ->
                     Button(
                         onClick = {
                             viewModel.addWater(amount)

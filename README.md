@@ -9,4 +9,5 @@ Date | Progress
 2.11 - 8.11| UI for main screens and dark mode implemented
 9.11 - 15.11| Logic for adding and substracting water
 16.11 - 22.11 | Persist data
+23.11 - 29.11 | Choose glass size + persist dailyGoal
 ## Setup Instruction

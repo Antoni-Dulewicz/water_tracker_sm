@@ -2,27 +2,34 @@ package com.example.watertracker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.watertracker.ui.components.*
+import com.example.watertracker.viewmodel.WaterViewModel
 
 @Composable
 fun SettingsScreen(
+    viewModel: WaterViewModel,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit
 ) {
-    var dailyGoal by remember { mutableFloatStateOf(2000f) }
+    val dailyGoal by viewModel.dailyGoal.collectAsState()
     var remindersEnabled by remember { mutableStateOf(true) }
     var darkModeEnabled by remember { mutableStateOf(false) }
+    val glassSizes by viewModel.glassSizes.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -41,14 +48,16 @@ fun SettingsScreen(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                "${dailyGoal.toInt()} ml",
+                "${dailyGoal} ml",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
 
             Slider(
-                value = dailyGoal,
-                onValueChange = { dailyGoal = it },
+                value = dailyGoal.toFloat(),
+                onValueChange = {
+                    viewModel.updateDailyGoal(it.toInt())
+                },
                 valueRange = 500f..5000f,
                 steps = 17
             )
@@ -60,6 +69,56 @@ fun SettingsScreen(
                 Text("500 ml", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text("5000 ml", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+        }
+
+        WaterCard {
+            Text(
+                "Rozmiary szklanek",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            GlassSizeField(
+                name = "Mała szklanka",
+                value = glassSizes.small,
+                onValueChange = { value ->
+                    viewModel.updateGlassSizes(
+                        small = value,
+                        medium = glassSizes.medium,
+                        large = glassSizes.large
+                    )
+                }
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            GlassSizeField(
+                name = "Średnia szklanka",
+                value = glassSizes.medium,
+                onValueChange = { value ->
+                    viewModel.updateGlassSizes(
+                        small = glassSizes.small,
+                        medium = value,
+                        large = glassSizes.large
+                    )
+                }
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            GlassSizeField(
+                name = "Duża szklanka",
+                value = glassSizes.large,
+                onValueChange = { value ->
+                    viewModel.updateGlassSizes(
+                        small = glassSizes.small,
+                        medium = glassSizes.medium,
+                        large = value
+                    )
+                }
+            )
         }
 
         WaterCard {

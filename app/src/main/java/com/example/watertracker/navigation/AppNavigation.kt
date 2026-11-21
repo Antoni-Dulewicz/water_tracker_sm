@@ -115,6 +115,7 @@ fun AppNavigation(
 
             composable(Screen.Settings.route) {
                 SettingsScreen(
+                    viewModel = waterViewModel,
                     isDarkMode = isDarkMode,
                     onDarkModeChange = onDarkModeChange
                 )

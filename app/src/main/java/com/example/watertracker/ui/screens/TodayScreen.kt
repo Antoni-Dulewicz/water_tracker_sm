@@ -22,6 +22,7 @@ fun TodayScreen(
 ) {
     val todayEntries by viewModel.todayEntries.collectAsState()
     val dailyGoal by viewModel.dailyGoal.collectAsState()
+    val glassSizes by viewModel.glassSizes.collectAsState()
 
     val consumed = todayEntries.sumOf { it.amount }
 
@@ -104,10 +105,17 @@ fun TodayScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
+            val glasses = listOf(
+                "Mała" to glassSizes.small,
+                "Średnia" to glassSizes.medium,
+                "Duża" to glassSizes.large
+            )
+
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                listOf(50, 100, 250).forEach { amount ->
+                glasses.forEach { (name, amount) ->
                     Button(
                         onClick = {
                             viewModel.addWater(amount)
@@ -116,7 +124,12 @@ fun TodayScreen(
                         shape = RoundedCornerShape(14.dp),
                         contentPadding = PaddingValues(vertical = 14.dp)
                     ) {
-                        Text("+${amount} ml")
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(name)
+                            Text("${amount} ml")
+                        }
                     }
                 }
             }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.watertracker.data.database.WaterDatabase
+import com.example.watertracker.data.preferences.WaterPreferences
 import com.example.watertracker.data.repository.WaterRepository
 
 class WaterViewModelFactory(
@@ -17,9 +18,10 @@ class WaterViewModelFactory(
 
             val database = WaterDatabase.getInstance(context)
             val repository = WaterRepository(database.waterDao())
+            val preferences = WaterPreferences(context)
 
             @Suppress("UNCHECKED_CAST")
-            return WaterViewModel(repository) as T
+            return WaterViewModel(repository, preferences) as T
         }
 
         throw IllegalArgumentException(

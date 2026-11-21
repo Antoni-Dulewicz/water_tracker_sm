@@ -2,6 +2,8 @@ package com.example.watertracker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.watertracker.data.model.GlassSizes
+import com.example.watertracker.data.preferences.WaterPreferences
 import com.example.watertracker.data.repository.WaterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,13 +13,25 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class WaterViewModel(
-    private val repository: WaterRepository
+    private val repository: WaterRepository,
+    private val waterPreferences: WaterPreferences
 ) : ViewModel() {
 
     private val entries = repository.entries
 
-    private val _dailyGoal = MutableStateFlow(2000)
-    val dailyGoal = _dailyGoal
+    val dailyGoal = waterPreferences.dailyGoal
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            2000
+        )
+
+    val glassSizes = waterPreferences.glassSizes
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            GlassSizes()
+        )
 
     private fun isToday(timestamp: Long): Boolean {
         val entryCalendar = Calendar.getInstance().apply {
@@ -125,7 +139,29 @@ class WaterViewModel(
 
     fun updateDailyGoal(goal: Int) {
         if (goal in 500..5000) {
-            _dailyGoal.value = goal
+            viewModelScope.launch {
+                waterPreferences.saveDailyGoal(goal)
+            }
+        }
+    }
+
+    fun updateGlassSizes(
+        small: Int,
+        medium: Int,
+        large: Int
+    ) {
+        if (
+            small > 0 &&
+            medium > 0 &&
+            large > 0
+        ) {
+            viewModelScope.launch {
+                waterPreferences.saveGlassSizes(
+                    small = small,
+                    medium = medium,
+                    large = large
+                )
+            }
         }
     }
 }
